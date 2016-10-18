@@ -1,7 +1,8 @@
 - name: Configure webserver with nginx
-  hosts: webserver
-  sudo: True
-  task:
+  hosts: webservers
+  become: yes
+  become_method: sudo
+  tasks:
     - name: install nginx
       apt: name=nginx update_cache=yes
 
@@ -10,12 +11,12 @@
 
     - name: enable configuration
       file: > 
-        dest=/etc/nginx/sites-available/default
+        dest=/etc/nginx/sites-enabled/default
         src=/etc/nginx/sites-available/default
         state=link
 
     - name: copy index.html
-      template: src=template/index.html.j2 dest=/usr/share/nginx/html/index.html 
+      template: src=templates/index.html.j2 dest=/usr/share/nginx/html/index.html 
         mode=0644
 
     - name: restart nginx
