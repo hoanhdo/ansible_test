@@ -1,0 +1,58 @@
+- Xem giá trị của biên (sử dụng trong lúc debug)
+  -degub: var=myvarname
+
+- Facts : ansible có thể kết nối đến host và thu thập các thông tin về host:
+ + CPU architecture
+ + OS
+ + IP 
+ + Memory 
+ + INFO
+ + DISK INFO 
+ Danh sách các varable trong ansible fact:
+ https://github.com/lorin/ansible-quickref/blob/master/facts.rst
+ Trước tasks command phải có gather_facts: True
+ Xem được toàn bộ facts thông qua module setup
+ ansible server_name -m setup
+ Module setup có thể filter các varable
+ ansible server_name -m setup -a 'filter=ansible_eth*'
+
+- Local facts
+ Có thể cấu hình thêm các facts nữa ở trong từng host bằng cách thêm file .init, json, 
+ executable file không có tham số và chuẩn ouput là json hoặc là standard out
+ vào trong folder /etc/ansible/facts.d
+ 
+ Ví dụ file : file /etc/ansible/facts.d/example.fact
+  [book]
+  title=Ansible: Up and Running
+  author=Lorin Hochstein
+  publisher=O'Reilly Media
+
+  Các tham số ở trên có thể truy cập qua varable ansible_local thêm cứ phap sau:
+  ansible_local.<ten_file_khong_có.fact><ten_group><ten_variable>
+  ví dụ : ansible_local.example.book.title
+
+- set_face định nghĩa 1 biên mới 
+  - set_fact: <ten_bien>=<value>
+  VD: 
+  - set_fact: snap={{ snap_result.stdout }}
+
+- Các built-in varable
+  hostvars:  A dict whose keys are Ansible host names and values are dicts that map variable names to values
+  inventory_hostname: Name of the current host as known by Ansible
+  group_names: A list of all groups that the current host is a member of
+  groups: A dict whose keys are Ansible group names and values are a list of hostnames that are members of the
+    group. Includes all and ungrouped groups: {"all": [...], "web": [...], "ungrou ped": [...]}
+  play_hosts: A list of inventory hostnames that are active in the current play
+  ansible_version: A dict with Ansible version info: {"full": 1.8.2", "major": 1, "minor": 8,"revision": 2, "string": "1.8.2"}
+
+- Có thể set variable trong command sử dụng tham số -e variable=value 
+  VD : ansible-playbook example.yml -e token=12345
+  Nế muốn có space trong variable thì có thể sử dụng " "
+  ansible-playbook greet.yml -e 'greeting="hi there"'
+
+- Thứ tự ưu tiên của các variable
+  1. (Highest) ansible-playbook -e var=value
+  2. Everything else not mentioned in this list
+  3. On a host or group, either defined in inventory file or YAML file
+  4. Facts
+  5. In defaults/main.yml of a role.
