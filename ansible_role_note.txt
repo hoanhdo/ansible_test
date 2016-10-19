@@ -1,0 +1,47 @@
+- Role là cách thức để chia từng phần của playbook thành nhiều file, sau đó có thể sử dụng lại 
+- Role có gán cho một hoặc nhiều host
+- Cấu trúc cơ bản của 2 Role
+    roles/database/tasks/main.yml
+        Tasks
+    roles/database/files/
+        Holds files to be uploaded to hosts
+    roles/database/templates/
+        Holds Jinja2 template files
+    roles/database/handlers/main.yml
+        Handlers
+    roles/database/vars/main.yml
+        Variables that shouldn’t be overridden
+    roles/database/defaults/main.yml
+        Default variables that can be overridden
+    roles/database/meta/main.yml
+        Dependency information about a role
+- Trong role thì có 3 chỗ có thể định nghĩa variables
+    + file var/main.yml
+    + trong var section
+    + trong defaults/main.yml
+    Trong 3 cái cách định nghĩa thứ tự ưu tiên từ cao đến thấp
+    main.yml
+    var section
+    defaults/main.yml
+    Chỉ có thể override được beiens trong var/main.yml khi dùng truyền tham số
+- Dùng command tạo role file and directory
+    ansible-galaxy init -p playbooks/roles web:
+    Các file được tạo ra
+    • playbooks/roles/web/tasks/main.yml
+    • playbooks/roles/web/handlers/main.yml
+    • playbooks/roles/web/vars/main.yml
+    • playbooks/roles/web/defaults/main.yml
+    • playbooks/roles/web/meta/main.yml
+    • playbooks/roles/web/files/
+    • playbooks/roles/web/templates/
+    • playbooks/roles/web/README.md
+
+- Dependent Roles
+    Khi thực hiện ansible, các role Dependency sẽ được thực hiện trước
+    Cáu hình trong file roles/web/meta/main.yml
+    dependencies: 
+        - { role: ntp, ntp_server=ntp.ubuntu.com }
+    Có thể cấu hình nhiều role là Dependency
+    dependencies:
+        - { role: web }
+        - { role: memcached }
